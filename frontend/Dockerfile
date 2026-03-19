@@ -1,19 +1,34 @@
-# Base image
-FROM node:18
+# Builder stage
+FROM node:20-alpine AS builder
 
-# Create working directory
+# Set working directory
 WORKDIR /app
 
-# Copy package files
+# Accept backend URL as a build argument
+ENV VITE_API_URL=http://localhost:5000/api
+
+# Copy package files and install dependencies
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+RUN npm install 
 
-# Copy all project files
+# Copy the rest of the source code
 COPY . .
 
-EXPOSE 3000
+# Build the frontend (Vite will use VITE_BACKEND_APP_URL)
+RUN npm run build
 
-# Start the application
-CMD ["npm", "start"]
+# Nginx stage
+FROM nginx:alpine
+
+# Copy built frontend
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy Nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
