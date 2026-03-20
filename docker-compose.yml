@@ -54,7 +54,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
 
   backend:
-    image: shailendrajr/backend
+    image: shailendrajr/backend:v1
     container_name: backend
     restart: always
     ports:
@@ -65,7 +65,7 @@ services:
       MONGO_URI: mongodb://root:password@mongo:27017/mydb?authSource=admin
 
   frontend:
-    image: shailendrajr/frontend
+    image: shailendrajr/frontend:v1
     container_name: frontend
     restart: always
     ports:
